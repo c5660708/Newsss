@@ -23,11 +23,12 @@ public class NewsTabAndPagerFragment extends Fragment {
     private TabLayout mTablayout;
     private ImageView mAddButton;
     private ViewPager mViewPager;
+    private MyPagerAdapter adapter;
     private SharedPreferences sp;
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable final Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_news,container,false);
         sp = this.getActivity().getSharedPreferences("type",Context.MODE_PRIVATE);
         mTablayout = (TabLayout) view.findViewById(R.id.tab_layout);
@@ -37,12 +38,13 @@ public class NewsTabAndPagerFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(),AddTabsActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent,1);
             }
         });
+
         mViewPager.setOffscreenPageLimit(3);
 
-        MyPagerAdapter adapter = new MyPagerAdapter(getChildFragmentManager());
+        adapter = new MyPagerAdapter(getChildFragmentManager());
         NewsListFragment fg1 = new NewsListFragment();
         Bundle args1 = new Bundle();
         args1.putString("type","top");
@@ -112,5 +114,17 @@ public class NewsTabAndPagerFragment extends Fragment {
         mViewPager.setAdapter(adapter);
         mTablayout.setupWithViewPager(mViewPager);
         return view;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        adapter = new MyPagerAdapter(getChildFragmentManager());
+        switch (requestCode){
+            case 1:
+                if (resultCode == getActivity().RESULT_OK){
+                    adapter.notifyDataSetChanged();
+                }
+        }
     }
 }

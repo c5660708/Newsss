@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.skyia.tablelayouttest.bean.NewsBean;
 import com.skyia.tablelayouttest.utils.HttpUtil;
+import com.yalantis.phoenix.PullToRefreshView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public class NewsListFragment extends Fragment implements NewsItemClickCallback{
     private String url;
     private String type;
     private RecyclerView mRecyclerView;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private PullToRefreshView mPullToRefreshView;
     private NewsListRecyclerViewAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private List<NewsBean.ResultBean.DataBean> mDataBeans;
@@ -59,12 +60,10 @@ public class NewsListFragment extends Fragment implements NewsItemClickCallback{
         type = getArguments().getString("type");
         url = "http://v.juhe.cn/toutiao/index?type="+type+"&key=01af65745ece9874aa369e1ed584c4aa";
         requestNews();
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        mPullToRefreshView.setOnRefreshListener(new PullToRefreshView.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 requestNews();
-                Toast.makeText(getActivity(),"刷新成功",Toast.LENGTH_SHORT).show();
-                mSwipeRefreshLayout.setRefreshing(false);
             }
         });
         return view;
@@ -88,6 +87,7 @@ public class NewsListFragment extends Fragment implements NewsItemClickCallback{
                         @Override
                         public void run() {
                             showNews(mDataBeans,getActivity());
+                            mPullToRefreshView.setRefreshing(false);
                         }
                     });
                 }catch (JsonSyntaxException e){
@@ -100,7 +100,7 @@ public class NewsListFragment extends Fragment implements NewsItemClickCallback{
     private void initView(View view){
         mRecyclerView = (RecyclerView) view.findViewById(R.id.news_list_recyclerview);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),DividerItemDecoration.VERTICAL));
-        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.layout_swipe_refresh);
+        mPullToRefreshView = (PullToRefreshView) view.findViewById(R.id.pull_to_refresh);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mAdapter = new NewsListRecyclerViewAdapter(null,getActivity());
         mRecyclerView.setAdapter(mAdapter);
@@ -113,7 +113,6 @@ public class NewsListFragment extends Fragment implements NewsItemClickCallback{
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
     }
-
 
     @Override
     public void onNewsItemClick(NewsBean.ResultBean.DataBean dataBean) {

@@ -1,5 +1,6 @@
 package com.skyia.tablelayouttest;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -48,7 +49,12 @@ public class AddTabsActivity extends AppCompatActivity {
                 }
             }
         });
-        MyPagerAdapter myPagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
-        myPagerAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent();
+        setResult(RESULT_OK,intent);
+        finish();
     }
 }
